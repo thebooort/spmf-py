@@ -140,18 +140,27 @@ class Spmf:
 
         if not self.patterns_:
             self.parse_output()
-
+        
         patterns_dict_list = []
         for pattern_sup in self.patterns_:
-            pattern = pattern_sup[:-1]
-            sup = pattern_sup[-1:][0]
-            sup = sup.strip()
-            if not sup.startswith("#SUP"):
-                print("support extraction failed")
-            sup = sup.split()
-            sup = sup[1]
+            # produce a string will all elements of list pattern_sup
+            full_pattern = ' '.join(pattern_sup)
 
-            patterns_dict_list.append({'pattern': pattern, 'sup': int(sup)})
+            # Divide pattern an support
+            if "#SUP:" in full_pattern:
+                pattern_part, sup_part = full_pattern.split("#SUP:")
+                pattern_part = pattern_part.strip()
+                sup_part = sup_part.strip()
+                
+                support_value = sup_part.split()[0]
+                
+                patterns_dict_list.append({
+                    "pattern": pattern_part,
+                    "support": support_value
+                })
+            else:
+                print("Support extraction failed for pattern:", full_pattern)
+        
 
         df = pd.DataFrame(patterns_dict_list)
         self.df_ = df
